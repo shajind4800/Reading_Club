@@ -1,10 +1,23 @@
-import React from 'react';
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AppProvider } from "./context/AppContext";
+import Toolbar from "./components/Toolbar/Toolbar";
+import { FetchProvider } from "./context/FetchContext";
+import { MainPage } from "./components/MainPage/Mainpage";
 
-import { AuthProvider } from './context/AuthContext';
-import Toolbar from './components/Toolbar/Toolbar';
+
 
 export const App: React.FC = () => (
-  <AuthProvider >
-      <Toolbar/>
-  </AuthProvider>
+  <AppProvider>
+    <BrowserRouter>
+      <Toolbar />
+      <FetchProvider>
+        <div style={{ marginTop: 56 }}>
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+          </Routes>
+        </div>
+      </FetchProvider>
+    </BrowserRouter>
+  </AppProvider>
 );

@@ -14,11 +14,12 @@ export const ToolbarContainer = styled.div`
   z-index: 1500;
 `;
 
-export const ToolbarLeft = styled.div`
+export const ToolbarLogoContainer = styled.div`
   display: flex;
   align-items: center;
   font-weight: 600;
   margin-right: 16px;
+  cursor : pointer;
 `;
 
 export const LogoWrapper = styled.div`

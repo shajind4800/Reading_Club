@@ -1,14 +1,14 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
-import { AuthContext } from '../context/AuthContext';
 import { Button } from './Button/Button';
+import { useAppContext } from '../context/AppContext';
 
 export const AuthButton: React.FC = () => {
-  const { isLoggedIn, login, logout } = useContext(AuthContext);
-
-  return isLoggedIn ? (
-    <Button onClick = {logout} text='Logout' />
+  const { state, dispatch } = useAppContext();
+  return state.isAuthenticated ? (
+    <Button onClick = {()=>dispatch({type : 'LOGOUT'})} text = "Logout"/>
   ) : (
-    <Button onClick = {login} text='Login' />
+    <Button onClick = {()=>dispatch({type : 'LOGIN'})} text="Login"/>
+  
   );
 };
