@@ -1,14 +1,17 @@
-import React, { createContext, useContext, useReducer, ReactNode } from "react";
-import { Action, AppContextProps, State } from "../types/types";
+import { createContext, useContext, useReducer, ReactNode, useEffect } from "react";
+import {  AppContextProps, AuthAction, AuthState } from "../types/types";
+import { useNavigate } from "react-router-dom";
 
-
-const initialState: State = {
-  isAuthenticated: sessionStorage.getItem("isAuthenticated") === "true",
+const initialState: AuthState = {
+  isAuthenticated: false,
 };
 
-const AppContext = createContext<AppContextProps>({ state: initialState, dispatch: () => null });
+const AppContext = createContext<AppContextProps>({
+  state: initialState,
+  dispatch: () => null,
+});
 
-const reducer = (state: State, action: Action): State  =>{
+const reducer = (state: AuthState, action: AuthAction): AuthState => {
   switch (action.type) {
     case "LOGIN":
       sessionStorage.setItem("isAuthenticated", "true");
@@ -19,10 +22,23 @@ const reducer = (state: State, action: Action): State  =>{
     default:
       return state;
   }
-}
+};
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const navigate  = useNavigate();
+
+  useEffect(() => {
+    const isAuth = sessionStorage.getItem("isAuthenticated") === "true";
+    if (isAuth) {
+      dispatch({ type: "LOGIN" });
+      navigate("/admin")
+    } else {
+      dispatch({ type: "LOGOUT" });
+      navigate("/")
+    }
+  }, []);
+
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       {children}
@@ -30,4 +46,4 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useAppContext = () => useContext<AppContextProps>(AppContext);
+export const useAppContext = () => useContext(AppContext);

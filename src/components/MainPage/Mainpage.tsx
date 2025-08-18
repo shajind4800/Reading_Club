@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { useRef } from "react";
 import {
   FocusText,
   MembersContainer,
@@ -8,26 +8,39 @@ import {
   SubText,
 } from "./MainPage.styles";
 
-import { FetchContext } from "../../context/FetchContext";
-import {MemberGrid} from "../MemberGrid/MemberGrid";
-import { FetchContextProps } from "../../types/types";
+import { MemberGrid } from "../MemberGrid/MemberGrid";
+import { useFetchContext } from "../../context/FetchContext";
+import { EmptyState } from "../EmptyState/EmptyState";
+import { LoaderOverlay } from "../MemberGrid/MemberGrid.styles";
+import { ClipLoader } from "react-spinners";
 
 export const MainPage: React.FC = () => {
-  const { totalMemeberCount } = useContext<FetchContextProps>(FetchContext) as  Pick<FetchContextProps , 'totalMemeberCount'>;
+  const { totalMembers, loading } = useFetchContext();
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    <ScrollContainer ref={scrollContainerRef}>
-      <SpaceContainer>
-        <MembersContainer>
-          <MembersHeader>
-            <FocusText>{totalMemeberCount}</FocusText>
-            <span> Members </span>
-            <SubText>have been actively engaged in our club!!!</SubText>
-          </MembersHeader>
-        </MembersContainer>
-      </SpaceContainer>
-      <MemberGrid scrollContainerRef={scrollContainerRef} />
-    </ScrollContainer>
+    <React.Fragment>
+      {loading && (
+        <LoaderOverlay>
+          <ClipLoader size={50} />
+        </LoaderOverlay>
+      )}
+      {!totalMembers && !loading ? (
+        <EmptyState message={"No active members in the club currently!"} />
+      ) : (
+        <ScrollContainer ref={scrollContainerRef}>
+          <SpaceContainer>
+            <MembersContainer>
+              <MembersHeader>
+                <FocusText>{totalMembers}</FocusText>
+                <span> Members </span>
+                <SubText>have been actively engaged in our club!!!</SubText>
+              </MembersHeader>
+            </MembersContainer>
+          </SpaceContainer>
+          <MemberGrid scrollContainerRef={scrollContainerRef} />
+        </ScrollContainer>
+      )}
+    </React.Fragment>
   );
 };

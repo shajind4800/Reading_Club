@@ -4,20 +4,29 @@ import { AppProvider } from "./context/AppContext";
 import Toolbar from "./components/Toolbar/Toolbar";
 import { FetchProvider } from "./context/FetchContext";
 import { MainPage } from "./components/MainPage/Mainpage";
-
-
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AdminPage } from "./components/AdminPage/AdminPage";
+import { PageContainer } from "./App.styles";
 
 export const App: React.FC = () => (
-  <AppProvider>
-    <BrowserRouter>
-      <Toolbar />
+  <BrowserRouter>
+    <AppProvider>
       <FetchProvider>
-        <div style={{ marginTop: 56 }}>
+        <Toolbar />
+        <PageContainer>
           <Routes>
             <Route path="/" element={<MainPage />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
-        </div>
+        </PageContainer>
       </FetchProvider>
-    </BrowserRouter>
-  </AppProvider>
+    </AppProvider>
+  </BrowserRouter>
 );

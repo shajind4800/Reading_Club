@@ -1,46 +1,36 @@
-import { createContext, useState, useEffect, ReactNode } from "react";
-import { Book, FetchContextProps, Member } from "../types/types";
+import React, { createContext, ReactNode, useContext, useEffect } from "react";
+import { useMembers } from "../hooks/useMembers";
+import { Overlay } from "../components/Overlay/Overlay";
 
-export const FetchContext = createContext<FetchContextProps>({
-  members: [],
-  totalMemeberCount : 0,
-  nextPage : 0,
-  books: [],
-});
+type FetchContextType = ReturnType<typeof useMembers>;
+
+export const FetchContext = createContext<FetchContextType | null>(null);
 
 export const FetchProvider = ({ children }: { children: ReactNode }) => {
-  const [members, setMembers] = useState<Member[]>([]);
-  const [books, setBooks] = useState<Book[]>([]);
-  const [totalRows , setTotalRows] = useState<number>(0);
-  const [page , setPage] = useState<number>(1);
+  const { loadBooks, loadMembers, error, ...state } = useMembers();
 
   useEffect(() => {
-    loadMembers();
+    loadMembers(1);
     loadBooks();
-  },[]);
-
-  const loadMembers = () => {
-    fetch(`http://localhost:3001/members?_sort=membershipStart&_order=asc&_page=${page}&_per_page=50`)
-      .then((res) => res.json())
-      .then((result) => {
-        setMembers(result.data);
-        setTotalRows(1000)
-        setPage(prev=>prev++)
-      })
-      .catch((err) => console.log(err));
-  };
-  const loadBooks = () => {
-    fetch("http://localhost:3001/books")
-      .then((res) => res.json())
-      .then((result) => {
-        setBooks(result);
-      })
-      .catch((err) => console.log(err));
-  };
-
+  }, []);
   return (
-    <FetchContext.Provider value={{ members, books ,nextPage : page ,totalMemeberCount:totalRows }}>
-      {children}
-    </FetchContext.Provider>
+    <React.Fragment>
+      {error ? (
+        <Overlay message={"Error on opening application"} />
+      ) : (
+        <FetchContext.Provider
+          value={{ ...state, error, loadBooks, loadMembers }}
+        >
+          {children}
+        </FetchContext.Provider>
+      )}
+    </React.Fragment>
   );
+};
+
+export const useFetchContext = () => {
+  const context = useContext<FetchContextType | null>(FetchContext);
+  if (!context)
+    throw new Error("useFetchContext must be used within FetchProvider");
+  return context;
 };
