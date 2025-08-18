@@ -153,7 +153,7 @@ export const MemberForm: React.FC<Props> = ({
       </FormGroup>
 
       <SubmitButton
-        disabled={!username || !email || !selectedBooks}
+        disabled={!username || !email || (Array.isArray(selectedBooks) ? !selectedBooks.length : !selectedBooks)}
         type="submit"
       >
         {title.split(" ")[0]}
